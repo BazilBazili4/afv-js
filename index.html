@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HierarchyAnalisys</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="aft.js"></script>
+  </head>
+  <body>
+  <div class="container">
+    <div class="jumbotron text-center">
+        <h1>Analytic hierarchy process</h1>
+        <p class="lead">This application is built on the Python Flask framework</p>
+      </div>
+    
+        <div id="content">
+            <p>Введите количество критериев:<input type="number" id="countNodes" > </p>
+            <input type="button" value="Create" id="createTable"/>
+            </p>
+            <div id="table">
+
+            </div>
+            <div id="objects-controll" style="display: none;">
+              <p>Введите количество объектов:<input type="number" id="countObjects" > </p>
+              <input type="button" value="Create" id="createTableObjects"/>            
+            </div>
+            <div id="tables">
+
+            </div>
+            <div id="result-controll" style="display: none;">
+              <input type="button" value="Result" id="result"/>            
+            </div>
+            <div id="result-val" style="display: block;">
+
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
