@@ -73,6 +73,66 @@ function createTableCriteria(size, headersClass, valuesClass, tableName = '') {
     return table;
 }
 
+function createTableObjects(criteriaArray, size, tableName = '') {
+    var table = $('<table class="table"></table>');
+    var sizeWithNodes = Number(size) + 3;
+    var row = $('<tr>dfd</tr>');//.text('result ' + i);
+    for(var j = 0; j < sizeWithNodes; j++){
+        if (j == 0) {
+            inputHtml = tableName;
+            // inputHtml = '<input type="text" ' + ' data-row='+ i + 'data-col=' + j + ' readonly>';
+        } else if (j == sizeWithNodes - 2) {
+            var inputId = generateInputId('idealPlus', 0, j); 
+            inputHtml = createInput('idealPlus', inputId, 0, j, 'Y+');
+            // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+        } else if (j == sizeWithNodes - 1) {
+            var inputId = generateInputId('idealMinus', 0, j); 
+            inputHtml = createInput('idealMinus', inputId, 0, j, 'Y-');
+            console.log(123);
+
+            // inputHtml = '<input type="text" ' + ' id="сriteria''+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+        } else {
+            var inputId = generateInputId('objectName', 0, j); 
+                inputHtml = createInput('objectName', inputId, 0, j, 'Вариант');
+        }
+        var element = $('<td></td>');
+        element.append(inputHtml);
+        row.append(element);
+
+        
+    }
+    table.append(row);
+
+    criteriaArray.forEach((criteria, i) => {
+        i = i + 1;
+        row = $('<tr>dfd</tr>');//.text('result ' + i);
+        for(var j = 0; j < sizeWithNodes; j++){
+            var inputHtml = '';
+            if (i == 0 && j == 0) {
+                inputHtml = tableName;
+                // inputHtml = '<input type="text" ' + ' data-row='+ i + 'data-col=' + j + ' readonly>';
+            } else if (j == 0) {
+                var inputId = generateInputId(criteria.getClassHeader(), i, j); 
+                inputHtml = createInput(criteria.getClassHeader(), inputId, i, j, criteria.name);
+                // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+            } else if (i == 0) {element = $('<td></td>');
+                var inputId = generateInputId(criteria.getClassHeader(), i, j); 
+                inputHtml = createInput(criteria.getClassHeader(), inputId, i, j, 'Вариант');
+                // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+            } else {
+                var inputId = generateInputId(criteria.className, i, j); 
+                inputHtml = createInput(criteria.className, inputId, i, j, 0);
+                // inputHtml = '<input type="number" ' + 'class="inputCriteria"'  + 'data-type="inputCriteria"' + ' value=0>';
+            }
+
+            var element = $('<td></td>').append(inputHtml);//.text("result" + j + i); //append(input id ij)
+            row.append(element);
+        }
+        table.append(row);
+    });
+    return table;
+}
+
 function getInputValue(className, row, col) {
     inputIdSelector = '#' + generateInputId(className, row, col);
     return $(inputIdSelector).val();
@@ -294,17 +354,15 @@ $(document).ready(function(){
         console.log(criteriaArray);
 
         getCriteriaTotal(criteriaArray);
-        criteriaArray.forEach(criterion => {
-            tableObjects.append(createTable(countObjects, criterion.getClassHeader(), criterion.className, criterion.name));
-        });
-        criteriaArray.forEach(criterion => {
-            field.on('change', criterion.getClassHeaderSelector(), function (e) {
-                reflectInputValue(e.target);
-            });
-            field.on('change', criterion.getClassSelector(), function (e) {
-                reflectCriterionValue(e.target);
-            });
-        });
+        tableObjects.append(createTableObjects(criteriaArray, countObjects));
+        // criteriaArray.forEach(criterion => {
+        //     field.on('change', criterion.getClassHeaderSelector(), function (e) {
+        //         reflectInputValue(e.target);
+        //     });
+        //     field.on('change', criterion.getClassSelector(), function (e) {
+        //         reflectCriterionValue(e.target);
+        //     });
+        // });
         showResultControls();
     });
     result.on('click', function () {
