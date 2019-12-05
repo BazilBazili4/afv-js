@@ -133,6 +133,66 @@ function createTableObjects(criteriaArray, size, tableName = '') {
     return table;
 }
 
+function createTableObjects(criteriaArray, size, tableName = '') {
+    var table = $('<table class="table"></table>');
+    var sizeWithNodes = Number(size) + 3;
+    var row = $('<tr>dfd</tr>');//.text('result ' + i);
+    for(var j = 0; j < sizeWithNodes; j++){
+        if (j == 0) {
+            inputHtml = tableName;
+            // inputHtml = '<input type="text" ' + ' data-row='+ i + 'data-col=' + j + ' readonly>';
+        } else if (j == sizeWithNodes - 2) {
+            var inputId = generateInputId('idealPlus', 0, j); 
+            inputHtml = createInput('idealPlus', inputId, 0, j, 'Y+');
+            // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+        } else if (j == sizeWithNodes - 1) {
+            var inputId = generateInputId('idealMinus', 0, j); 
+            inputHtml = createInput('idealMinus', inputId, 0, j, 'Y-');
+            console.log(123);
+
+            // inputHtml = '<input type="text" ' + ' id="сriteria''+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+        } else {
+            var inputId = generateInputId('objectName', 0, j); 
+                inputHtml = createInput('objectName', inputId, 0, j, 'Вариант');
+        }
+        var element = $('<td></td>');
+        element.append(inputHtml);
+        row.append(element);
+
+        
+    }
+    table.append(row);
+
+    criteriaArray.forEach((criteria, i) => {
+        i = i + 1;
+        row = $('<tr>dfd</tr>');//.text('result ' + i);
+        for(var j = 0; j < sizeWithNodes; j++){
+            var inputHtml = '';
+            if (i == 0 && j == 0) {
+                inputHtml = tableName;
+                // inputHtml = '<input type="text" ' + ' data-row='+ i + 'data-col=' + j + ' readonly>';
+            } else if (j == 0) {
+                var inputId = generateInputId(criteria.getClassHeader(), i, j); 
+                inputHtml = createInput(criteria.getClassHeader(), inputId, i, j, criteria.name);
+                // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+            } else if (i == 0) {element = $('<td></td>');
+                var inputId = generateInputId(criteria.getClassHeader(), i, j); 
+                inputHtml = createInput(criteria.getClassHeader(), inputId, i, j, 'Вариант');
+                // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+            } else {
+                var inputId = generateInputId(criteria.className, i, j); 
+                inputHtml = createInput(criteria.className, inputId, i, j, 0);
+                // inputHtml = '<input type="number" ' + 'class="inputCriteria"'  + 'data-type="inputCriteria"' + ' value=0>';
+            }
+
+            var element = $('<td></td>').append(inputHtml);//.text("result" + j + i); //append(input id ij)
+            row.append(element);
+        }
+        table.append(row);
+    });
+    return table;
+}
+
 function getInputValue(className, row, col) {
     inputIdSelector = '#' + generateInputId(className, row, col);
     return $(inputIdSelector).val();
@@ -223,6 +283,7 @@ function setCriterion(criterionId = 1, criterionName = '', criterionValues = [])
         name: criterionName,
         className: translitToLatin(criterionName),
         values: criterionValues,
+        objectValues: [],
         getClassSelector() {
             return '.' + this.className;
         },
@@ -231,6 +292,12 @@ function setCriterion(criterionId = 1, criterionName = '', criterionValues = [])
         },
         getClassHeader() {
             return this.className + 'Head';
+        },
+        getYplus() {
+            return this.objectValues[this.objectValues.length - 2];
+        },
+        getYminus() {
+            return this.objectValues[this.objectValues.length - 1];
         }
     };
 }
@@ -244,6 +311,36 @@ function setCriteriaArray(criteriaCount) {
         criteriaArray[i] = setCriterion(criterionId, criterionName, criterionValues);
     }
     return criteriaArray;
+}
+
+function setCriteriaArray(criteriaCount) {
+    criteriaArray = [];
+    for(var i = 0; i < criteriaCount; i++){
+        criterionId = i + 1;
+        criterionName = getCriterionName(criterionId);
+        criterionValues = getCriterionValues(criterionId, criteriaCount);
+        criteriaArray[i] = setCriterion(criterionId, criterionName, criterionValues);
+    }
+    return criteriaArray;
+}
+
+function updateCriteriaArray(criteriaArray, objectsCount) {
+
+    var newArray = criteriaArray.map((criterion, i) => {
+            criterionId = i + 1;
+            criterionName = getCriterionName(criterionId);
+            var criterionValues = [];
+            obj = Number(objectsCount) + 2;
+
+            for (var j = 0; j <  obj; j++) {
+
+                criterionValues[j] = Number(getInputValue(criterion.className, criterionId, j + 1));
+            }
+            criterion.objectValues = criterionValues;
+            return criterion;
+    });
+
+    return newArray;
 }
 
 function setObject(objectId = 1, objectName = '', objectValues = []) {
@@ -336,6 +433,8 @@ $(document).ready(function(){
     var tableObjects = $('#tables');
     var butCreateTable = $("#createTable");
     var butCreateObjects = $("#createTableObjects");
+    var butCreateMatrix = $("#createTableObjects");
+
     var result = $("#result");
     butCreateTable.on('click', function () {
         var countNodes = $("#countNodes").val();
@@ -355,6 +454,8 @@ $(document).ready(function(){
 
         getCriteriaTotal(criteriaArray);
         tableObjects.append(createTableObjects(criteriaArray, countObjects));
+        console.log(updateCriteriaArray(criteriaArray, countObjects));
+
         // criteriaArray.forEach(criterion => {
         //     field.on('change', criterion.getClassHeaderSelector(), function (e) {
         //         reflectInputValue(e.target);
