@@ -339,8 +339,16 @@ function updateCriteriaArray(criteriaArray, objectsCount) {
             criterion.objectValues = criterionValues;
             return criterion;
     });
-
     return newArray;
+}
+
+function filterCriteria(criteriaArray) {
+    return criteriaArray.filter(
+        (criterion, index) => {
+            let yDiff = Math.abs(criterion.getYplus() - criterion.getYminus());
+            return yDiff > 1;
+        }
+    );
 }
 
 function setObject(objectId = 1, objectName = '', objectValues = []) {
@@ -398,6 +406,10 @@ function showResultControls() {
     $('#result-controll').attr("style","display: block");
 }
 
+function showMatrixControls() {
+    $('#matrix-controll').attr("style","display: block");
+}
+
 
 function translitToLatin (str) {
     
@@ -433,7 +445,7 @@ $(document).ready(function(){
     var tableObjects = $('#tables');
     var butCreateTable = $("#createTable");
     var butCreateObjects = $("#createTableObjects");
-    var butCreateMatrix = $("#createTableObjects");
+    var butCreateMatrix = $("#matrix");
 
     var result = $("#result");
     butCreateTable.on('click', function () {
@@ -448,22 +460,20 @@ $(document).ready(function(){
         });
     });    
     butCreateObjects.on('click', function () {
-        criteriaArray = setCriteriaArray($("#countNodes").val());
         var countObjects = $("#countObjects").val();
-        console.log(criteriaArray);
 
-        getCriteriaTotal(criteriaArray);
+        criteriaArray = setCriteriaArray($("#countNodes").val());
+
         tableObjects.append(createTableObjects(criteriaArray, countObjects));
-        console.log(updateCriteriaArray(criteriaArray, countObjects));
 
-        // criteriaArray.forEach(criterion => {
-        //     field.on('change', criterion.getClassHeaderSelector(), function (e) {
-        //         reflectInputValue(e.target);
-        //     });
-        //     field.on('change', criterion.getClassSelector(), function (e) {
-        //         reflectCriterionValue(e.target);
-        //     });
-        // });
+        showMatrixControls();
+    });
+    butCreateMatrix.on('click', function () {
+        var countObjects = $("#countObjects").val();
+
+        console.log(updateCriteriaArray(criteriaArray, countObjects));
+        console.log(filterCriteria(criteriaArray));
+
         showResultControls();
     });
     result.on('click', function () {
