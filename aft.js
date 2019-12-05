@@ -351,6 +351,23 @@ function filterCriteria(criteriaArray) {
     );
 }
 
+function setRelativeObjectValues(criteriaArray) {
+    return criteriaArray.map(
+        (criterion, index) => {
+            criterion.objectValues = criterion.objectValues.map(
+                (value, index) => {
+                    if (index < criterion.objectValues.length -2) {
+                        return (criterion.getYplus() - value) / (criterion.getYplus() - criterion.getYminus());
+                    } else {
+                        return value;
+                    }
+                }
+            );
+            return criterion;
+        }
+    );
+}
+
 function setObject(objectId = 1, objectName = '', objectValues = []) {
     return {
         id: objectId,
@@ -473,7 +490,7 @@ $(document).ready(function(){
 
         console.log(updateCriteriaArray(criteriaArray, countObjects));
         console.log(filterCriteria(criteriaArray));
-
+        console.log(setRelativeObjectValues(criteriaArray));
         showResultControls();
     });
     result.on('click', function () {
