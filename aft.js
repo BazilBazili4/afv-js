@@ -140,14 +140,13 @@ function createTableMatrix(criteriaArray, size, objectsArray, tableName = '') {
         if (j == 0) {
             inputHtml = tableName;    
         } else {
+            console.log(123);
             var inputId = generateInputId('objectName', 0, j); 
-                inputHtml = createInput('objectName', inputId, 0, j, objectsArray[j]);
+                inputHtml = createInput('objectName', inputId, 0, j, objectsArray[j - 1]);
         }
         var element = $('<td></td>');
         element.append(inputHtml);
-        row.append(element);
-
-        
+        row.append(element);        
     }
     table.append(row);
 
@@ -169,7 +168,7 @@ function createTableMatrix(criteriaArray, size, objectsArray, tableName = '') {
                 // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
             } else {
                 var inputId = generateInputId(criteria.className, i, j); 
-                inputHtml = createInput(criteria.className, inputId, i, j, criteria.objectValues[j]);
+                inputHtml = createInput(criteria.className, inputId, i, j, criteria.objectValues[j - 1]);
                 // inputHtml = '<input type="number" ' + 'class="inputCriteria"'  + 'data-type="inputCriteria"' + ' value=0>';
             }
 
@@ -554,6 +553,7 @@ $(document).ready(function(){
     var field = $('#content');
     var table = $('#table');
     var tableObjects = $('#tables');
+    var tableMatrix = $('#tablesMatrix');
     var butCreateTable = $("#createTable");
     var butCreateObjects = $("#createTableObjects");
     var butCreateMatrix = $("#matrix");
@@ -590,6 +590,7 @@ $(document).ready(function(){
         objectsNames = setObjectsNamesArray(countObjects);
         console.log(objectsNames);
         console.log(criteriaArray);
+        tableMatrix.html(createTableMatrix(criteriaArray, countObjects, objectsNames));
         matrix = getObjectsMatrix(criteriaArray);
         console.log(matrix);
         matrix = getResultMatrix(matrix, criteriaArray);
