@@ -180,6 +180,51 @@ function createTableMatrix(criteriaArray, size, objectsArray, tableName = '') {
     return table;
 }
 
+function createTableResult(size, resultMatrix,  objectsArray, tableName = '') {
+    var table = $('<table class="table"></table>');
+    var sizeWithNodes = Number(size) + 1;
+    var row = $('<tr>dfd</tr>');//.text('result ' + i);
+    for(var j = 0; j < sizeWithNodes; j++){
+        if (j == 0) {
+            inputHtml = tableName;    
+        } else {
+            console.log(123);
+            var inputId = generateInputId('objectName', 0, j); 
+                inputHtml = createInput('objectName', inputId, 0, j, objectsArray[j - 1]);
+        }
+        var element = $('<td></td>');
+        element.append(inputHtml);
+        row.append(element);        
+    }
+    table.append(row);
+    let powerArray = ['p1', 'p2', 'p4'];
+    powerArray.forEach((power, i) => {
+        i = i + 1;
+        row = $('<tr>dfd</tr>');//.text('result ' + i);
+        for(var j = 0; j < sizeWithNodes; j++){
+            var inputHtml = '';
+            if (i == 0 && j == 0) {
+                inputHtml = tableName;
+                // inputHtml = '<input type="text" ' + ' data-row='+ i + 'data-col=' + j + ' readonly>';
+            } else if (j == 0) {
+                var inputId = generateInputId('head', i, j); 
+                inputHtml = createInput('head', inputId, i, j, power);
+                // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+            } else {
+                var inputId = generateInputId('val', i, j); 
+                inputHtml = createInput('val', inputId, i, j, resultMatrix[i - 1][j - 1]);
+                // inputHtml = '<input type="number" ' + 'class="inputCriteria"'  + 'data-type="inputCriteria"' + ' value=0>';
+            }
+
+            var element = $('<td></td>').append(inputHtml);//.text("result" + j + i); //append(input id ij)
+            row.append(element);
+        }
+        table.append(row);
+    });
+    return table;
+}
+
+
 function createTableObjects(criteriaArray, size, tableName = '') {
     var table = $('<table class="table"></table>');
     var sizeWithNodes = Number(size) + 3;
@@ -554,6 +599,7 @@ $(document).ready(function(){
     var table = $('#table');
     var tableObjects = $('#tables');
     var tableMatrix = $('#tablesMatrix');
+    var tableResult = $('#tablesResult');
     var butCreateTable = $("#createTable");
     var butCreateObjects = $("#createTableObjects");
     var butCreateMatrix = $("#matrix");
@@ -594,6 +640,7 @@ $(document).ready(function(){
         matrix = getObjectsMatrix(criteriaArray);
         console.log(matrix);
         matrix = getResultMatrix(matrix, criteriaArray);
+        tableResult.html(createTableResult(countObjects, matrix, objectsNames));
         console.log(matrix);
 
     });    
