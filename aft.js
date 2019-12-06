@@ -88,7 +88,6 @@ function createTableObjects(criteriaArray, size, tableName = '') {
         } else if (j == sizeWithNodes - 1) {
             var inputId = generateInputId('idealMinus', 0, j); 
             inputHtml = createInput('idealMinus', inputId, 0, j, 'Y-');
-            console.log(123);
 
             // inputHtml = '<input type="text" ' + ' id="сriteria''+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
         } else {
@@ -133,6 +132,55 @@ function createTableObjects(criteriaArray, size, tableName = '') {
     return table;
 }
 
+function createTableMatrix(criteriaArray, size, objectsArray, tableName = '') {
+    var table = $('<table class="table"></table>');
+    var sizeWithNodes = Number(size) + 1;
+    var row = $('<tr>dfd</tr>');//.text('result ' + i);
+    for(var j = 0; j < sizeWithNodes; j++){
+        if (j == 0) {
+            inputHtml = tableName;    
+        } else {
+            var inputId = generateInputId('objectName', 0, j); 
+                inputHtml = createInput('objectName', inputId, 0, j, objectsArray[j]);
+        }
+        var element = $('<td></td>');
+        element.append(inputHtml);
+        row.append(element);
+
+        
+    }
+    table.append(row);
+
+    criteriaArray.forEach((criteria, i) => {
+        i = i + 1;
+        row = $('<tr>dfd</tr>');//.text('result ' + i);
+        for(var j = 0; j < sizeWithNodes; j++){
+            var inputHtml = '';
+            if (i == 0 && j == 0) {
+                inputHtml = tableName;
+                // inputHtml = '<input type="text" ' + ' data-row='+ i + 'data-col=' + j + ' readonly>';
+            } else if (j == 0) {
+                var inputId = generateInputId(criteria.getClassHeader(), i, j); 
+                inputHtml = createInput(criteria.getClassHeader(), inputId, i, j, criteria.name);
+                // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+            } else if (i == 0) {element = $('<td></td>');
+                var inputId = generateInputId(criteria.getClassHeader(), i, j); 
+                inputHtml = createInput(criteria.getClassHeader(), inputId, i, j, 'Вариант');
+                // inputHtml = '<input type="text" ' + ' id="сriteria'+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
+            } else {
+                var inputId = generateInputId(criteria.className, i, j); 
+                inputHtml = createInput(criteria.className, inputId, i, j, criteria.objectValues[j]);
+                // inputHtml = '<input type="number" ' + 'class="inputCriteria"'  + 'data-type="inputCriteria"' + ' value=0>';
+            }
+
+            var element = $('<td></td>').append(inputHtml);//.text("result" + j + i); //append(input id ij)
+            row.append(element);
+        }
+        table.append(row);
+    });
+    return table;
+}
+
 function createTableObjects(criteriaArray, size, tableName = '') {
     var table = $('<table class="table"></table>');
     var sizeWithNodes = Number(size) + 3;
@@ -148,8 +196,6 @@ function createTableObjects(criteriaArray, size, tableName = '') {
         } else if (j == sizeWithNodes - 1) {
             var inputId = generateInputId('idealMinus', 0, j); 
             inputHtml = createInput('idealMinus', inputId, 0, j, 'Y-');
-            console.log(123);
-
             // inputHtml = '<input type="text" ' + ' id="сriteria''+ i + '_' + j + '" class="сriteriaName"'  + 'data-row='+ i + ' data-col=' + j + ' value="Название">';
         } else {
             var inputId = generateInputId('objectName', 0, j); 
@@ -195,6 +241,7 @@ function createTableObjects(criteriaArray, size, tableName = '') {
 
 function getInputValue(className, row, col) {
     inputIdSelector = '#' + generateInputId(className, row, col);
+    generateInputId(className, row, col);
     return $(inputIdSelector).val();
 }
 
@@ -211,12 +258,11 @@ function getCriterionValues(criterionId, criteriaCount) {
 }
 
 function getObjectName(objectId) {
-    return getInputValue('objectName', objectId, 0);
+    return getInputValue('objectName', 0, objectId);
 }
 
 function getObjectValues(criterionId, criteriaCount, objectClass) {
     var criterionValues = [];
-    console.log(objectClass);
     for(var i = 0; i < criteriaCount; i++){
         criterionValues[i] = Number(getInputValue(objectClass, criterionId, i + 1));
     }
@@ -368,6 +414,41 @@ function setRelativeObjectValues(criteriaArray) {
     );
 }
 
+function getObjectsMatrix(criteriaArray) {
+    let result = [];
+    for (let j = 0; j < criteriaArray[0].objectValues.length - 2; j++) {
+        objectArray = [];
+        for (let index = 0; index < criteriaArray.length; index++) {
+            objectArray[index] = criteriaArray[index].objectValues[j];       
+        }
+        result[j] = objectArray;
+    }
+    return result;
+}
+
+function getResultMatrix(objectsMatrix, criteriaArray) {
+    let powerArray = [1, 2, 4];
+    let localPriorityVector = getLocalPriorityVectorNormalized(criteriaArray);
+    result = [];
+    powerArray.forEach(
+        (power, index) => {
+            objectsMatrixResult = [];
+            for (let i = 0; i < objectsMatrix.length; i++) {
+                let sum = 0
+                for (let j = 0; j < localPriorityVector.length; j++) {
+                    let diff = (1 - objectsMatrix[i][j])
+                    let p = Math.pow(diff, power);
+                    sum = sum + p;
+                    // console.log(objectsMatrixResult);
+                }
+                objectsMatrixResult[i] = Math.pow(sum, 1/power); 
+            }
+            result[index] = objectsMatrixResult;
+        }
+    );
+    return result;
+}
+
 function setObject(objectId = 1, objectName = '', objectValues = []) {
     return {
         id: objectId,
@@ -389,6 +470,17 @@ function setObjectsArray(objectsCount, objectClass) {
         criteriaArray[i] = setObject(objectId, objectName, objectValues);
     }
     return criteriaArray;
+}
+
+function setObjectsNamesArray(objectsCount) {
+    namesArray = [];
+    for(var i = 0; i < objectsCount; i++){
+        objectId = i + 1;
+        objectName = getObjectName(objectId);
+        console.log(objectName);
+        namesArray[i] = objectName;
+    }
+    return namesArray;
 }
 
 function reflectInputValue(input) {
@@ -454,6 +546,8 @@ function translitToLatin (str) {
 
 $(document).ready(function(){
     var criteriaArray = [];
+    var matrix = [];
+
     var config = getConfig();
     var her = $("h2");
     her.css("color", "red"); 
@@ -488,14 +582,18 @@ $(document).ready(function(){
     butCreateMatrix.on('click', function () {
         var countObjects = $("#countObjects").val();
 
-        console.log(updateCriteriaArray(criteriaArray, countObjects));
-        console.log(filterCriteria(criteriaArray));
-        console.log(setRelativeObjectValues(criteriaArray));
-        showResultControls();
-    });
-    result.on('click', function () {
-        var countObjects = $("#countObjects").val();
-        
-    });
-    
+        criteriaArray = updateCriteriaArray(criteriaArray, countObjects);
+        console.log(criteriaArray);
+        criteriaArray = filterCriteria(criteriaArray);
+        console.log(criteriaArray);
+        criteriaArray = setRelativeObjectValues(criteriaArray);
+        objectsNames = setObjectsNamesArray(countObjects);
+        console.log(objectsNames);
+        console.log(criteriaArray);
+        matrix = getObjectsMatrix(criteriaArray);
+        console.log(matrix);
+        matrix = getResultMatrix(matrix, criteriaArray);
+        console.log(matrix);
+
+    });    
 });
